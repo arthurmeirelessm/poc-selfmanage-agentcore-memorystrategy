@@ -7,8 +7,8 @@ MEMORY_NAME = "memory_self_managed_batch10"
 DESCRIPTION = "Self managed memory with batch 10 events"
 
 S3_BUCKET = "selfmanagement-messages"
-SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:275573050667:selfmanagenment-topic"
-MEMORY_ROLE = "arn:aws:iam::275573050667:role/selfmanagement-agentcore-memory"
+SNS_TOPIC_ARN = ""
+MEMORY_ROLE = ""
 
 control = boto3.client(
     "bedrock-agentcore-control",
