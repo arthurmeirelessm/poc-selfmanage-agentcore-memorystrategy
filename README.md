@@ -150,8 +150,8 @@ result = agentcore_rt.retrieve_memory_records(
 
 | Variável | Descrição |
 |---|---|
-| `MEMORY_ID` | ID da Memory criada (`memory_self_managed_batch10-NjNmP1CdDX`) |
-| `STRATEGY_ID` | ID da Strategy criada (`self_managed_batch10-5cIsF17PIM`) |
+| `MEMORY_ID` | ID da Memory criada (``) |
+| `STRATEGY_ID` | ID da Strategy criada (``) |
 | `MODEL_ID` | Model ID do Claude no Bedrock |
 | `REGION` | Região AWS (`us-east-1`) |
 
