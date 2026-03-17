@@ -10,7 +10,21 @@ Repositório de experimentação e validação do pipeline de memória episódic
 
 ![Arquitetura do pipeline AgentCore Self-Managed](agentcore_pipeline_architecture_v3.svg)
 
-### Fluxo completo
+
+### Fluxo local simulado
+
+1. O **`sqs_event.py`** injeta o evento SQS diretamente, simulando a entrega de 1 mensagem pela fila
+2. O **`lambda_handler(event, context)`** recebe o evento e extrai o `s3PayloadLocation` e `jobId`
+3. O pipeline baixa o arquivo de mensagens do **S3** (`get_object`), substituindo o trigger real do AgentCore
+4. O **Step 1 — Extraction** é executado chamando diretamente `invoke_claude(EXTRACTION_SYSTEM_PROMPT)`, sem Lambda separada
+5. O **Step 2 — Consolidation** é executado em sequência com `invoke_claude(CONSOLIDATION_SYSTEM_PROMPT)`, sem Step Functions orquestrando
+6. O **Step 3 — Reflection** é executado com `invoke_claude(REFLECTION_SYSTEM_PROMPT)`, completando o pipeline em processo único
+7. O **`save_to_agentcore()`** persiste as reflections via `batch_create_memory_records`, idêntico ao comportamento de produção
+8. O **`retrieve.py`** valida o resultado chamando `retrieve_memory_records`, simulando o `GET /retrieve` do agente
+
+
+
+### Fluxo completo cenario Produtivo
 
 1. O **agente** envia turnos de conversa via `POST /turn` para o **API Gateway**
 2. A **Lambda backend** recebe a requisição e chama `create_event` no AgentCore Memory
@@ -56,9 +70,9 @@ Cria o recurso `Memory` no AgentCore com a estratégia `SELF_MANAGED` configurad
 ---
 
 ### `src/pipeline_lambda.py`
-**Simula:** o handler que rodará dentro de cada step do **Step Functions**
+**Simula:** os handlers que rodarão dentro de cada step do **Step Functions**
 
-É o coração do pipeline. Recebe o evento SNS (com o path do arquivo S3), executa as três etapas de processamento via Claude (Bedrock) e salva os resultados no AgentCore Memory.
+É o coração do pipeline. Recebe o evento SQS (com o path do arquivo S3) no cenário local, mas em produção deve receber StartExecution event do Step Function que starta processo inicial e executa as três etapas de processamento via Claude (Bedrock) e salva os resultados no AgentCore Memory.
 
 **Etapas internas:**
 
